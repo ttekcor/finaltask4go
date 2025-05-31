@@ -27,31 +27,30 @@ func parsePackage(data string) (int, time.Duration, error) {
 		steps, err = strconv.Atoi(result[0])
 		if err != nil {
 
-			return 0, 0, err
+			return 0, 0, fmt.Errorf("ошибка парсинга шагов: %v", err)
 		}
 		timeWalk, err = time.ParseDuration(result[1])
 		if err != nil {
-			return 0, 0, err
+			return 0, 0, fmt.Errorf("ошибка парсинга времени: %v", err)
 		}
 		return steps, timeWalk, nil
+	} else {
+		return 0, 0, errors.New("")
 	}
-	return 0, 0, errors.New("")
 }
 
 func DayActionInfo(data string, weight, height float64) string {
 	// TODO: реализовать функцию
+	
 	steps, duration, err := parsePackage(data)
-	if steps != 0 && err == nil {
+	if err != nil && steps == 0{
+		return fmt.Sprintf("⚠ Ошибка данных: %v", err)
+	} else {
 		distance := (float64(steps) * stepLength) / mInKm
 		calories, err := spentcalories.WalkingSpentCalories(steps, weight, height, duration)
 		if err != nil {
-			return err.Error()
-		}
-		return fmt.Sprintf("Количество шагов: %d\nДистанция составила %b\nВы сожгли %b", steps, distance, calories)
-	} else if err != nil {
-		return err.Error()
-	} else {
-		return ""
+		return fmt.Sprintf("⚠ Ошибка подсчёта калорий: %v", err)
 	}
-
-}
+		return fmt.Sprintf("Количество шагов: %d\nДистанция составила %.2f км.\nВы сожгли %.2f ккал.", steps, distance, calories)
+	
+}}

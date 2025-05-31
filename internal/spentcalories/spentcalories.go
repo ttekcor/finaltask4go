@@ -56,35 +56,43 @@ func meanSpeed(steps int, height float64, duration time.Duration) float64 {
 }
 
 func TrainingInfo(data string, weight, height float64) (string, error) {
-	// TODO: реализовать функцию
 	steps, name, duration, err := parseTraining(data)
-	if err == nil {
-		switch name {
-		case "Бег":
-			caloriesRun, err := RunningSpentCalories(steps, weight, height, duration)
-			if err == nil {
-				return "", err
-			} else {
-
-				result := fmt.Sprintf(("Тип тренировки: %s\nДлительность: %b\nДистанция: %b\nСкорость: %b\nСожгли калорий: %b"), name, duration.Hours(), distance(steps, height), meanSpeed(steps, height, duration), caloriesRun)
-				return result, nil
-			}
-
-		case "Ходьба":
-			caloriesWalk, err := RunningSpentCalories(steps, weight, height, duration)
-			if err != nil {
-				return "", err
-			} else {
-				result := fmt.Sprintf(("Тип тренировки: %s\nДлительность: %b\nДистанция: %b\nСкорость: %b\nСожгли калорий: %b"), name, duration.Hours(), distance(steps, height), meanSpeed(steps, height, duration), caloriesWalk)
-				return result, nil
-			}
-		default:
-			return "", errors.New("неизвестный тип тренировки")
-		}
-	} else {
-		return "", err
+	if err != nil {
+		return fmt.Sprintf("⚠ Ошибка данных: %v", err), nil
 	}
 
+	switch strings.TrimSpace(name) {
+	case "Бег":
+		caloriesRun, err := RunningSpentCalories(steps, weight, height, duration)
+		if err != nil {
+			return fmt.Sprintf("⚠ Ошибка подсчёта калорий: %v", err), nil
+		}
+		return fmt.Sprintf(
+			"Тип тренировки: %s\nДлительность: %.2f ч\nДистанция: %.2f км\nСкорость: %.2f км/ч\nСожгли калорий: %.2f ккал",
+			name,
+			duration.Hours(),
+			distance(steps, height),
+			meanSpeed(steps, height, duration),
+			caloriesRun,
+		), nil
+
+	case "Ходьба":
+		caloriesWalk, err := WalkingSpentCalories(steps, weight, height, duration)
+		if err != nil {
+			return fmt.Sprintf("⚠ Ошибка подсчёта калорий: %v", err), nil
+		}
+		return fmt.Sprintf(
+			"Тип тренировки: %s\nДлительность: %.2f ч\nДистанция: %.2f км\nСкорость: %.2f км/ч\nСожгли калорий: %.2f ккал",
+			name,
+			duration.Hours(),
+			distance(steps, height),
+			meanSpeed(steps, height, duration),
+			caloriesWalk,
+		), nil
+
+	default:
+		return fmt.Sprintf("⚠ Неизвестный тип тренировки: %s", name), nil
+	}
 }
 
 func RunningSpentCalories(steps int, weight, height float64, duration time.Duration) (float64, error) {
