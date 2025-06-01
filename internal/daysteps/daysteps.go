@@ -10,6 +10,7 @@ import (
 	"github.com/Yandex-Practicum/tracker/internal/spentcalories"
 )
 
+// извиняюсь немножко, я случайно сначала коммиттил в main
 const (
 	// Длина одного шага в метрах
 	stepLength = 0.65
